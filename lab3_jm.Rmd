@@ -1,30 +1,46 @@
 ---
-title: "lab 3"
+title: 'Lab #3'
 author: "Jay Maxwell"
-date: "9/22/2020"
 output: html_document
 ---
-
+<h4>DS202</h4>
+<h4>Fall 2020</h4>
+<hr>
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+dat <- readxl::read_xls('maxwellGSS.xls')
 ```
 
-## R Markdown
+1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+dat <- dat %>% rename(party='Political party affiliation', edu = 'Highest year of school completed' ) %>% mutate(party = factor(party), edu=factor(edu))
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+dat1 <- dat %>% 
+  group_by(party) %>%
+  mutate(edu_avg = mean(as.numeric(edu))) %>% 
+  select(party,edu_avg) %>% 
+  distinct(party, .keep_all = TRUE ) %>% 
+  arrange(desc(edu_avg))
 
-```{r cars}
-summary(cars)
+dat1
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+dat2 <- dat %>% 
+  group_by(party) %>%
+  mutate(edu_med = median(as.numeric(edu))) %>%
+  ungroup() %>%
+  filter(as.numeric(edu) > edu_med)
+
+str(dat2)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
