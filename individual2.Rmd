@@ -1,0 +1,233 @@
+---
+title: "individual2"
+author: "Jaeyeon Won"
+date: "9/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading in the Data Set
+```{r cars}
+# libraries
+library(readxl)
+library(ggplot2)
+library(tidyverse)
+
+# Reading in the data set
+happiness <- readxl::read_xls('JaeyeonWon_GSS.xls')
+
+# Information
+str(happiness) 
+```
+
+
+## Exploration
+**Use ggplot2 to create the plots, and dplyr to manipulate the data frame as much as possible. You may want to rename the columns of the data frame for your convenience using rename in dplyr.**
+```{r}
+# Renaming
+names(happiness)
+happiness = happiness %>% 
+  rename(year = 'Gss year for this respondent',
+         id = 'Respondent id number',
+         married = 'Marital status',
+         age = 'Age of respondent',
+         edu = 'Highest year of school completed',
+         gender = 'Respondents sex',
+         income = 'Total family income',
+         party = 'Political party affiliation', 
+         happiness = 'General happiness')
+names(happiness)
+```
+
+**1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.**
+```{r}
+# edu
+happiness$edu = as.factor(happiness$edu)
+levels(happiness$edu)
+
+# party
+happiness$party = as.factor(happiness$party)
+levels(happiness$party)
+
+# Numerical summary of average years of education for each political party affiliation
+`%notin%` <- Negate(`%in%`)
+
+happiness1 = happiness %>% 
+  filter(edu %notin% c("No answer", "Don't know")) %>%
+  group_by(party) %>%
+  summarise(mean_edu = mean(as.numeric(edu), na.rm = TRUE)) %>%
+  arrange(desc(mean_edu))
+
+happiness1 %>% 
+  head(10)
+
+# Graphical summary of average years of education for each political party affiliation
+happiness1 %>%
+  ggplot(aes(x = reorder(party, -mean_edu), weight = mean_edu, fill = party)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle('Barplot of Average Years of Education for Each Political Party Affiliation') +
+  xlab('Party Affiliation') +
+  ylab('Average Years of Education')
+```
+
+For this analysis, I excluded the answers "No answer" and "Don't know" in the edu variable. People who did not answer or did not know their party affiliation have the highest average years of education (around 9 years). People in strong Democratic party affiliation had the next highest mean years of education of 8.8 years, followed by Other party, Not strong democrat, Strong republican, Independent, Independent near democrat, Not strong republican, and Independent near republican. The people in Independent near Republican group showed the lowest average years of education of 7.9 years.
+
+
+**2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.**
+```{r}
+happiness2 = happiness %>% 
+  filter(edu %notin% c("No answer", "Don't know")) %>%
+  group_by(party) %>%
+  mutate(median_edu = median(as.numeric(edu))) %>%
+  filter(as.numeric(edu) > median_edu) %>%
+  ungroup()
+
+str(happiness2)
+```
+
+
+**For each of the investigation below, create at least one numerical summary and one appropriate visualization. Write a paragraph to describe your findings and the variables you used.**
+
+**3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.**
+```{r}
+str(happiness)
+
+# married
+happiness$married = as.factor(happiness$married)
+levels(happiness$married)
+
+# happiness
+happiness$happiness = as.factor(happiness$happiness)
+levels(happiness$happiness)
+levels(happiness$happiness) = c("Don't know", "No answer", "Not applicable", "Not too happy", "Happy", "Happy")
+
+# Numerical summary
+happiness %>%
+  filter(happiness == "Happy") %>%
+  group_by(married) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+# Graphical summary
+happiness %>% 
+  ggplot(aes(x = married, fill = happiness)) +
+  geom_bar(position = 'fill') +
+  coord_flip() +
+  ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
+  xlab('Marital Status') +
+  ylab('Happiness')
+```
+
+
+**4. Does party affiliation affect the relationship you found in the last question?**
+```{r}
+# Numerical summary
+happiness %>%
+  filter(happiness == "Happy") %>%
+  group_by(married, party) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(10)
+
+# Graphical summary
+happiness %>% 
+  ggplot(aes(x = married, fill = happiness)) +
+  geom_bar(position = 'fill') +
+  facet_wrap(~ party) +
+  coord_flip() +
+  ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
+  xlab('Marital Status') +
+  ylab('Happiness')
+```
+
+
+**5. How is marital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?**
+```{r}
+# Numerical summary of average years of education for each marital status
+happiness3 = happiness %>% 
+  filter(edu %notin% c("No answer", "Don't know")) %>%
+  group_by(married) %>%
+  summarise(mean_edu = mean(as.numeric(edu), na.rm = TRUE)) %>%
+  arrange(desc(mean_edu))
+
+happiness3 %>% 
+  head()
+
+# Graphical summary of average years of education for each marital status
+happiness3 %>%
+  ggplot(aes(x = reorder(married, -mean_edu), weight = mean_edu, fill = married)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle('Barplot of Average Years of Education for Each Marital Status') +
+  xlab('Marital Status') +
+  ylab('Average Years of Education')
+```
+
+
+**6. Explore two more interesting questions, and answer those questions using the GSS data.**
+**6.1 How is the happiness of a respondent related to his/her total house income? Define that a person is happy if the response to question is “Very happy” or “Pretty happy” **
+```{r}
+# income
+happiness$income = as.factor(happiness$income)
+levels(happiness$income)
+
+# Numerical summary
+happiness4 = happiness %>% 
+  filter(income %notin% c("Don't know", "No answer", "Not applicable", "Refused"),
+         happiness == "Happy") %>%
+  group_by(income) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+happiness4 %>%
+  head(12)
+
+# Graphical summary
+happiness$income <- factor(happiness$income, levels = c("Lt $1000",
+                                                        "$1000 to 2999", 
+                                                        "$3000 to 3999",
+                                                        "$4000 to 4999",  
+                                                        "$5000 to 5999",  
+                                                        "$6000 to 6999",
+                                                        "$7000 to 7999",
+                                                        "$8000 to 9999",
+                                                        "$10000 - 14999", 
+                                                        "$15000 - 19999", 
+                                                        "$20000 - 24999", 
+                                                        "$25000 or more",
+                                                        "Don't know", 
+                                                        "No answer", 
+                                                        "Not applicable", 
+                                                        "Refused"))
+
+happiness %>% 
+  filter(income %notin% c("Don't know", "No answer", "Not applicable", "Refused")) %>%
+  ggplot(aes(x = income, fill = happiness)) +
+  geom_bar(position = 'fill') +
+  coord_flip() +
+  ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
+  xlab('Marital Status') +
+  ylab('Happiness')
+```
+
+
+**6.2 ~~**
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
