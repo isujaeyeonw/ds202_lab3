@@ -1,6 +1,6 @@
 ---
 title: 'Lab #3'
-author: "Jay Maxwell"
+author: "Jay Maxwell, Jaeyeon Won, Alec Meyer"
 output: html_document
 ---
 <h4>DS202</h4>
@@ -43,11 +43,35 @@ str(dat2)
 
 ```
 
-3. asdfasdfsadf
+3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.
+
+
+```{r}
+dat3 <- dat %>% 
+  rename(happy = 'General happiness', married='Marital status') %>%
+  mutate(happy = factor(happy), married=factor(married)) %>%
+  select(happy,married)
+
+dat3 <- dat3 %>% group_by(married,happy) %>% summarize(n=n())
+
+
+dat3
+
+ggplot(dat3, aes(x=married, y=n)) + geom_bar(aes(fill=happy),
+                                               stat="identity",
+                                               color="white",
+                                               position = position_dodge(.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  xlab("Marital status") + ylab('Frequency')
 
 
 
-4. asdfasdfasdf
+```
+
+
+
+
+4. Does party affiliation affect the relationship you found in the last question?
 ```{r}
 dat4 <- dat %>% 
   rename(happy = 'General happiness', married='Marital status') %>%
@@ -64,5 +88,6 @@ dat4 <- dat4 %>%
 
 dat4  %>% data.frame
   
-  
 ```
+
+I don't think this works the way I thought it worked. We need to change this. don't sumbit this code!
