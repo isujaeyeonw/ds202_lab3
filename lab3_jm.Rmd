@@ -16,16 +16,41 @@ dat <- readxl::read_xls('maxwellGSS.xls')
 1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.
 
 ```{r}
-dat <- dat %>% rename(party='Political party affiliation', edu = 'Highest year of school completed' ) %>% mutate(party = factor(party), edu=factor(edu))
+#dat <- dat %>% rename(party='Political party affiliation', edu = 'Highest year of school completed' ) %>% mutate(party = factor(party), edu=factor(edu))
 
-dat1 <- dat %>% 
+#dat1 <- dat %>% 
+#  group_by(party) %>%
+#  mutate(edu_avg = mean(as.numeric(edu))) %>% 
+#  select(party,edu_avg) %>% 
+#  distinct(party, .keep_all = TRUE ) %>% 
+#  arrange(desc(edu_avg))
+
+#dat1
+
+# Jaeyeon's Review and Revision
+# You can also try this Jay!
+dat = dat %>% 
+  rename(married = 'Marital status',
+         age = 'Age of respondent',
+         edu = 'Highest year of school completed',
+         income = 'Total family income',
+         party = 'Political party affiliation', 
+         happiness = 'General happiness')
+
+dat$edu = as.factor(dat$edu)
+dat$party = as.factor(dat$party)
+
+`%notin%` <- Negate(`%in%`)
+
+
+
+jaeyeonDat <- dat %>% 
   group_by(party) %>%
-  mutate(edu_avg = mean(as.numeric(edu))) %>% 
-  select(party,edu_avg) %>% 
-  distinct(party, .keep_all = TRUE ) %>% 
-  arrange(desc(edu_avg))
+  filter(edu %notin% c("No answer", "Don't know")) %>%
+  summarise(mean_edu = mean(as.numeric(edu))) %>%
+  arrange(desc(mean_edu))
 
-dat1
+jaeyeonDat
 
 ```
 
@@ -49,20 +74,20 @@ str(dat2)
 
 4. asdfasdfasdf
 ```{r}
-dat4 <- dat %>% 
-  rename(happy = 'General happiness', married='Marital status') %>%
-  mutate(happy = factor(happy), married=factor(married), party=factor(party))
+#dat4 <- dat %>% 
+#  rename(happy = 'General happiness', married='Marital status') %>%
+#  mutate(happy = factor(happy), married=factor(married), party=factor(party))
 
-p <- ggplot(dat4, aes(x=married, y=happy)) + geom_boxplot()
-p
+#p <- ggplot(dat4, aes(x=married, y=happy)) + geom_boxplot()
+#p
 
-dat4 <- dat4 %>% 
-  mutate(happy= as.numeric(happy)) %>% 
-  group_by(married,party) %>% 
-  summarize(happy=mean(happy)) %>%
-  arrange(desc(happy))
+#dat4 <- dat4 %>% 
+#  mutate(happy= as.numeric(happy)) %>% 
+#  group_by(married,party) %>% 
+#  summarize(happy=mean(happy)) %>%
+#  arrange(desc(happy))
 
-dat4  %>% data.frame
+#dat4  %>% data.frame
   
   
 ```
