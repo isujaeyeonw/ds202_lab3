@@ -375,10 +375,32 @@ DS202
 Fall 2020
 </h4>
 <hr>
+<pre class="r"><code>##  DATA CLEANING   ##
+#  RENAME THE COLUMNS  &amp; change to factors where needed
+dat &lt;- dat %&gt;% 
+  rename(party=&#39;Political party affiliation&#39;,
+                      edu = &#39;Highest year of school completed&#39;,
+                      married = &#39;Marital status&#39;,
+                      age = &#39;Age of respondent&#39;,
+                      income = &#39;Total family income&#39;,
+                      happy = &#39;General happiness&#39;) %&gt;% 
+  mutate(party = factor(party), 
+         edu=factor(edu), 
+         married=factor(married),
+         age=factor(age),
+         income=factor(income), 
+         happy=factor(happy))
+
+## TO DO ___
+##  GET RID OF &#39;Don&#39;t know&#39;   &#39;No answer&#39;  &#39;NA&#39;   &#39;Not applicable&#39; from happy
+## GET RID OF NA    Source     No answer    from married</code></pre>
 <ol style="list-style-type: decimal">
 <li>Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.</li>
 </ol>
-<pre class="r"><code>#dat &lt;- dat %&gt;% rename(party=&#39;Political party affiliation&#39;, edu = &#39;Highest year of school completed&#39; ) %&gt;% mutate(party = factor(party), edu=factor(edu))
+<pre class="r"><code>#&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+#dat &lt;- dat %&gt;% rename(party=&#39;Political party affiliation&#39;, edu = &#39;Highest year of school completed&#39; ) %&gt;% mutate(party = factor(party), edu=factor(edu))
+#=======
+#&gt;&gt;&gt;&gt;&gt;&gt;&gt; 119dadeb64853e57426df32f519580fc6bc78e27
 
 #dat1 &lt;- dat %&gt;% 
 #  group_by(party) %&gt;%
@@ -391,20 +413,10 @@ Fall 2020
 
 # Jaeyeon&#39;s Review and Revision
 # You can also try this Jay!
-dat = dat %&gt;% 
-  rename(married = &#39;Marital status&#39;,
-         age = &#39;Age of respondent&#39;,
-         edu = &#39;Highest year of school completed&#39;,
-         income = &#39;Total family income&#39;,
-         party = &#39;Political party affiliation&#39;, 
-         happiness = &#39;General happiness&#39;)
-
 dat$edu = as.factor(dat$edu)
 dat$party = as.factor(dat$party)
 
 `%notin%` &lt;- Negate(`%in%`)
-
-
 
 jaeyeonDat &lt;- dat %&gt;% 
   group_by(party) %&gt;%
@@ -430,7 +442,7 @@ jaeyeonDat &lt;- dat %&gt;%
 <ol start="2" style="list-style-type: decimal">
 <li>Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.</li>
 </ol>
-<pre class="r"><code>dat2 &lt;- dat %&gt;% 
+<pre class="r"><code>dat2 &lt;- dat %&gt;%
   group_by(party) %&gt;%
   mutate(edu_med = median(as.numeric(edu))) %&gt;%
   ungroup() %&gt;%
@@ -438,18 +450,36 @@ jaeyeonDat &lt;- dat %&gt;%
 
 str(dat2)</code></pre>
 <pre><code>## tibble [28,281 x 7] (S3: tbl_df/tbl/data.frame)
-##  $ married  : chr [1:28281] &quot;Never married&quot; &quot;Married&quot; &quot;Never married&quot; &quot;Married&quot; ...
-##  $ age      : chr [1:28281] &quot;23&quot; &quot;27&quot; &quot;27&quot; &quot;56&quot; ...
-##  $ edu      : Factor w/ 23 levels &quot;0&quot;,&quot;1&quot;,&quot;10&quot;,&quot;11&quot;,..: 9 10 9 18 21 20 21 20 10 9 ...
-##  $ income   : chr [1:28281] &quot;Not applicable&quot; &quot;Not applicable&quot; &quot;Not applicable&quot; &quot;Not applicable&quot; ...
-##  $ party    : Factor w/ 10 levels &quot;Don&#39;t know&quot;,&quot;Ind,near dem&quot;,..: 2 6 2 7 9 6 9 3 2 10 ...
-##  $ happiness: chr [1:28281] &quot;Not too happy&quot; &quot;Not too happy&quot; &quot;Not too happy&quot; &quot;Pretty happy&quot; ...
-##  $ edu_med  : num [1:28281] 7 6 7 7 7 6 7 7 7 7 ...</code></pre>
+##  $ married: Factor w/ 7 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 3 2 3 2 2 1 2 2 2 2 ...
+##  $ age    : Factor w/ 75 levels &quot;18&quot;,&quot;19&quot;,&quot;20&quot;,..: 6 10 10 39 37 32 24 45 29 54 ...
+##  $ edu    : Factor w/ 23 levels &quot;0&quot;,&quot;1&quot;,&quot;10&quot;,&quot;11&quot;,..: 9 10 9 18 21 20 21 20 10 9 ...
+##  $ income : Factor w/ 16 levels &quot;$1000 to 2999&quot;,..: 15 15 15 15 15 15 15 15 15 15 ...
+##  $ party  : Factor w/ 10 levels &quot;Don&#39;t know&quot;,&quot;Ind,near dem&quot;,..: 2 6 2 7 9 6 9 3 2 10 ...
+##  $ happy  : Factor w/ 6 levels &quot;Don&#39;t know&quot;,&quot;No answer&quot;,..: 4 4 4 5 5 4 6 6 6 5 ...
+##  $ edu_med: num [1:28281] 7 6 7 7 7 6 7 7 7 7 ...</code></pre>
 <ol start="3" style="list-style-type: decimal">
-<li><p>asdfasdfsadf</p></li>
-<li><p>asdfasdfasdf</p></li>
+<li>How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.</li>
 </ol>
-<pre class="r"><code>#dat4 &lt;- dat %&gt;% 
+<pre class="r"><code>#dat3 &lt;- dat %&gt;% select(happy,married,party)
+
+#dat3 &lt;- dat3 %&gt;% group_by(happy,married) %&gt;% summarize(n=n()) 
+
+
+#dat3
+
+#q3plot &lt;- ggplot(dat3, aes(x=married, y=n)) + geom_bar(aes(fill=happy),
+#                                               stat=&quot;identity&quot;,
+#                                               color=&quot;white&quot;,
+#                                               position = position_dodge(.9)) +
+#  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+#  xlab(&quot;Marital status&quot;) + ylab(&#39;Frequency&#39;) 
+
+#q3plot + coord_flip() facet_wrap(~party)</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>Does party affiliation affect the relationship you found in the last question?</li>
+</ol>
+<pre class="r"><code>#&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+#dat4 &lt;- dat %&gt;% 
 #  rename(happy = &#39;General happiness&#39;, married=&#39;Marital status&#39;) %&gt;%
 #  mutate(happy = factor(happy), married=factor(married), party=factor(party))
 
@@ -462,7 +492,13 @@ str(dat2)</code></pre>
 #  summarize(happy=mean(happy)) %&gt;%
 #  arrange(desc(happy))
 
-#dat4  %&gt;% data.frame</code></pre>
+#dat4  %&gt;% data.frame
+  
+  
+#=======
+
+#&gt;&gt;&gt;&gt;&gt;&gt;&gt; 119dadeb64853e57426df32f519580fc6bc78e27</code></pre>
+<p>I don’t think this works the way I thought it worked. We need to change this. don’t sumbit this code!</p>
 
 
 

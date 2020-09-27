@@ -13,10 +13,36 @@ library(tidyverse)
 dat <- readxl::read_xls('maxwellGSS.xls')
 ```
 
+```{r}
+##  DATA CLEANING   ##
+#  RENAME THE COLUMNS  & change to factors where needed
+dat <- dat %>% 
+  rename(party='Political party affiliation',
+                      edu = 'Highest year of school completed',
+                      married = 'Marital status',
+                      age = 'Age of respondent',
+                      income = 'Total family income',
+                      happy = 'General happiness') %>% 
+  mutate(party = factor(party), 
+         edu=factor(edu), 
+         married=factor(married),
+         age=factor(age),
+         income=factor(income), 
+         happy=factor(happy))
+
+## TO DO ___
+##  GET RID OF 'Don't know'   'No answer'  'NA'   'Not applicable' from happy
+## GET RID OF NA    Source     No answer    from married
+
+```
+
 1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.
 
 ```{r}
+#<<<<<<< HEAD
 #dat <- dat %>% rename(party='Political party affiliation', edu = 'Highest year of school completed' ) %>% mutate(party = factor(party), edu=factor(edu))
+#=======
+#>>>>>>> 119dadeb64853e57426df32f519580fc6bc78e27
 
 #dat1 <- dat %>% 
 #  group_by(party) %>%
@@ -29,20 +55,10 @@ dat <- readxl::read_xls('maxwellGSS.xls')
 
 # Jaeyeon's Review and Revision
 # You can also try this Jay!
-dat = dat %>% 
-  rename(married = 'Marital status',
-         age = 'Age of respondent',
-         edu = 'Highest year of school completed',
-         income = 'Total family income',
-         party = 'Political party affiliation', 
-         happiness = 'General happiness')
-
 dat$edu = as.factor(dat$edu)
 dat$party = as.factor(dat$party)
 
 `%notin%` <- Negate(`%in%`)
-
-
 
 jaeyeonDat <- dat %>% 
   group_by(party) %>%
@@ -58,7 +74,7 @@ jaeyeonDat
 2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.
 
 ```{r}
-dat2 <- dat %>% 
+dat2 <- dat %>%
   group_by(party) %>%
   mutate(edu_med = median(as.numeric(edu))) %>%
   ungroup() %>%
@@ -68,12 +84,37 @@ str(dat2)
 
 ```
 
-3. asdfasdfsadf
+3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.
 
 
-
-4. asdfasdfasdf
 ```{r}
+#dat3 <- dat %>% select(happy,married,party)
+
+#dat3 <- dat3 %>% group_by(happy,married) %>% summarize(n=n()) 
+
+
+#dat3
+
+#q3plot <- ggplot(dat3, aes(x=married, y=n)) + geom_bar(aes(fill=happy),
+#                                               stat="identity",
+#                                               color="white",
+#                                               position = position_dodge(.9)) +
+#  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+#  xlab("Marital status") + ylab('Frequency') 
+
+#q3plot + coord_flip() facet_wrap(~party)
+
+
+
+```
+
+
+
+
+4. Does party affiliation affect the relationship you found in the last question?
+
+```{r}
+#<<<<<<< HEAD
 #dat4 <- dat %>% 
 #  rename(happy = 'General happiness', married='Marital status') %>%
 #  mutate(happy = factor(happy), married=factor(married), party=factor(party))
@@ -90,4 +131,9 @@ str(dat2)
 #dat4  %>% data.frame
   
   
+#=======
+
+#>>>>>>> 119dadeb64853e57426df32f519580fc6bc78e27
 ```
+
+I don't think this works the way I thought it worked. We need to change this. don't sumbit this code!
