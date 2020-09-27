@@ -3,25 +3,28 @@ title: 'Lab #3'
 author: "Jay Maxwell, Jaeyeon Won, Alec Meyer"
 output: html_document
 ---
+<h4>DS202</h4>
+<h4>Fall 2020</h4>
+<hr>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# libraries
+#library(readxl)
+library(tidyverse)
+
+##moved tidyverse loading up here to hide the conflicts ouput --jm
 ```
 
 ## Reading in the Data Set
-```{r cars}
-# libraries
-library(readxl)
-library(ggplot2)
-library(tidyverse)
-
+```{r}
 # Reading in the data set
 happiness <- readxl::read_xls('JaeyeonWon_GSS.xls')
 
 # Structure
 str(happiness) 
 ```
-
+<hr>
 
 ## Exploration
 **Use ggplot2 to create the plots, and dplyr to manipulate the data frame as much as possible. You may want to rename the columns of the data frame for your convenience using rename in dplyr.**
@@ -40,6 +43,8 @@ happiness = happiness %>%
          happiness = 'General happiness')
 names(happiness)
 ```
+
+<hr>
 
 **1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.**
 ```{r}
@@ -75,6 +80,7 @@ happiness1 %>%
 
 For this analysis, we excluded the answers "No answer" and "Don't know" in the edu variable. People who did not know their party affiliation have the highest average years of education (around 9.1 years). People in strong Democratic party affiliation have the next highest mean years of education of 8.8 years, followed by Other party, No answer, Not strong democrat, Strong republican, Independent, Independent near democrat, Not strong republican, and Independent near republican. The people in Independent near Republican group showed the lowest average years of education of 7.9 years.
 
+<hr>
 
 **2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.**
 ```{r}
@@ -92,6 +98,7 @@ str(happiness2)
 
 In this data frame, we have 28143 observations and 10 variables. Compared to the original data set that contains 64814 observations and 9 variables, we lost 36671 observations and added 1 new variable called "median_edu".
 
+<hr>
 
 **For each of the investigation below, create at least one numerical summary and one appropriate visualization. Write a paragraph to describe your findings and the variables you used.**
 **3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.**
@@ -128,6 +135,7 @@ happiness %>%
 
 For this analysis, we used the variables "happiness" and "married". We are defining that a person is happy if he/she answered either “Very happy” or “Pretty happy”. In the numerical summary, we are only taking into account the number of "Happy" responses (not considering how many people are in each marital status group). Based on the numerical summary, we can see that the group Married" has the highest number of happy people of 29342, which is followed by Never married, Divorced, Widowed, Separated, and No answer. The proportional aspects can be found in the graphical summary. The "Married" people show the highest proportion of the response "Happy". Around 75% of the people the "Widowed", "Divorced", and "Never married" groups also responded that they are happy.  
 
+<hr>
 
 **4. Does party affiliation affect the relationship you found in the last question?**
 ```{r}
@@ -153,6 +161,7 @@ happiness %>%
 
 For this analysis, we used the variables "happiness", "married", and "party".Except for the "Don't know" group, the political party affiliation groups have very similar patterns. Except for the other party groups, the married people have the highest proportion of happy people while the no answer group has the lowest proportion of happy people. In other party group, the no answer group has the highest proportion of happy people. So party affiliation does not have a huge impact on the relationship between happiness and marital status.
 
+<hr>
 
 **5. How is marital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?**
 ```{r}
@@ -178,6 +187,7 @@ happiness3 %>%
 
 Here, we are using the variables "happiness" and married". According to the numerical and graphical summaries, the people in the "Widowed" group has the longest average years of education of 9.6 years. The next group with the next longest mean years of education is "No answer" group. The average years of education decreases in order of "Separated", "Married", "Divorced", and "Never married" groups. The pattern of the "Never married" group ranking the lowest makes sense because the shorter they were educated for, it is more possible that they are younger. And the younger people are more likely to never get married.
 
+<hr>
 
 **6. Explore two more interesting questions, and answer those questions using the GSS data.**
 
@@ -220,8 +230,8 @@ happiness %>%
   ggplot(aes(x = income, fill = happiness)) +
   geom_bar(position = 'fill') +
   coord_flip() +
-  ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
-  xlab('Marital Status') +
+  ggtitle('Stacked Barplot of Happiness by Income') +
+  xlab('Income Level') +
   ylab('Happiness') +
   labs(fill = "Happiness")
 ```
