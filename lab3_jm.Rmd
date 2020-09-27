@@ -15,7 +15,13 @@ dat <- readxl::read_xls('maxwellGSS.xls')
 
 ```{r}
 ##  DATA CLEANING   ##
-#  RENAME THE COLUMNS  & change to factors where needed
+#  RENAME THE COLUMNS  
+# change to factors where needed
+# get rid of responses we don't need
+# drop all the na
+`%notin%` = function(x,y) !(x %in% y)
+
+
 dat <- dat %>% 
   rename(party='Political party affiliation',
                       edu = 'Highest year of school completed',
@@ -28,46 +34,42 @@ dat <- dat %>%
          married=factor(married),
          age=factor(age),
          income=factor(income), 
-         happy=factor(happy))
-
-## TO DO ___
-##  GET RID OF 'Don't know'   'No answer'  'NA'   'Not applicable' from happy
-## GET RID OF NA    Source     No answer    from married
-
+         happy=factor(happy)) %>%
+  filter(happy %notin% c("Don't know", "No answer", "Not applicable"),
+         married %notin% c('Source','No answer'),
+         edu %notin% c("Don't know", 'No answer')) %>%
+  drop_na()
 ```
 
 1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.
 
 ```{r}
-#<<<<<<< HEAD
-#dat <- dat %>% rename(party='Political party affiliation', edu = 'Highest year of school completed' ) %>% mutate(party = factor(party), edu=factor(edu))
-#=======
-#>>>>>>> 119dadeb64853e57426df32f519580fc6bc78e27
+dat1 <- dat %>% 
+  group_by(party) %>%
+  mutate(edu_avg = mean(as.numeric(edu))) %>% 
+  select(party,edu_avg) %>% 
+  distinct(party, .keep_all = TRUE ) %>% 
+  arrange(desc(edu_avg))
 
-#dat1 <- dat %>% 
-#  group_by(party) %>%
-#  mutate(edu_avg = mean(as.numeric(edu))) %>% 
-#  select(party,edu_avg) %>% 
-#  distinct(party, .keep_all = TRUE ) %>% 
-#  arrange(desc(edu_avg))
+dat1
 
 #dat1
-
+########################################################
 # Jaeyeon's Review and Revision
 # You can also try this Jay!
-dat$edu = as.factor(dat$edu)
-dat$party = as.factor(dat$party)
-
-`%notin%` <- Negate(`%in%`)
-
-jaeyeonDat <- dat %>% 
-  group_by(party) %>%
-  filter(edu %notin% c("No answer", "Don't know")) %>%
-  summarise(mean_edu = mean(as.numeric(edu))) %>%
-  arrange(desc(mean_edu))
-
-jaeyeonDat
-
+# dat$edu = as.factor(dat$edu)
+# dat$party = as.factor(dat$party)
+# 
+# `%notin%` <- Negate(`%in%`)
+# 
+# jaeyeonDat <- dat %>% 
+#   group_by(party) %>%
+#   filter(edu %notin% c("No answer", "Don't know")) %>%
+#   summarise(mean_edu = mean(as.numeric(edu))) %>%
+#   arrange(desc(mean_edu))
+# 
+# jaeyeonDat
+#############################################################
 ```
 
 
@@ -88,23 +90,21 @@ str(dat2)
 
 
 ```{r}
-#dat3 <- dat %>% select(happy,married,party)
+dat3 <- dat %>% select(happy,married,party)
 
-#dat3 <- dat3 %>% group_by(happy,married) %>% summarize(n=n()) 
-
-
-#dat3
-
-#q3plot <- ggplot(dat3, aes(x=married, y=n)) + geom_bar(aes(fill=happy),
-#                                               stat="identity",
-#                                               color="white",
-#                                               position = position_dodge(.9)) +
-#  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
-#  xlab("Marital status") + ylab('Frequency') 
-
-#q3plot + coord_flip() facet_wrap(~party)
+dat3 <- dat3 %>% group_by(happy,married) %>% summarize(n=n())
 
 
+
+
+q3plot <- ggplot(dat3, aes(x=married, y=n)) + geom_bar(aes(fill=happy),
+                                               stat="identity",
+                                               color="white",
+                                               position = position_dodge(.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  xlab("Marital status") + ylab('Frequency') 
+
+q3plot + coord_flip() 
 
 ```
 
@@ -114,26 +114,41 @@ str(dat2)
 4. Does party affiliation affect the relationship you found in the last question?
 
 ```{r}
-#<<<<<<< HEAD
-#dat4 <- dat %>% 
-#  rename(happy = 'General happiness', married='Marital status') %>%
-#  mutate(happy = factor(happy), married=factor(married), party=factor(party))
+dat3 <- dat %>% 
+  select(happy,married,party) %>% 
+  group_by(happy,married) %>%
+  summarize(n=n()) %>% 
+  ungroup()
 
-#p <- ggplot(dat4, aes(x=married, y=happy)) + geom_boxplot()
-#p
+q3plot <- ggplot(dat3, aes(x=married, y=n)) + 
+  geom_bar(aes(fill=happy),
+           stat="identity",
+           color="white",
+           position = position_dodge(.9)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  xlab("Marital status") + ylab('Frequency') 
 
-#dat4 <- dat4 %>% 
-#  mutate(happy= as.numeric(happy)) %>% 
-#  group_by(married,party) %>% 
-#  summarize(happy=mean(happy)) %>%
-#  arrange(desc(happy))
-
-#dat4  %>% data.frame
-  
-  
-#=======
-
-#>>>>>>> 119dadeb64853e57426df32f519580fc6bc78e27
+q3plot #  + facet_grid(~party)
 ```
 
-I don't think this works the way I thought it worked. We need to change this. don't sumbit this code!
+I want to do a facet wrap with this, but I get an error. For some reason the "party" data is not available for plotting purposes?
+
+
+5. How is marrital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?
+
+
+```{r}
+
+dat5 <- dat %>%
+  group_by(married) %>%
+  select(married,edu) %>% 
+  summarize(avg_edu=mean(as.numeric(edu), n=n())) %>%
+  arrange(avg_edu)
+
+
+dat5 %>% ggplot(aes(x =married, weight = avg_edu)) + geom_bar() + ylab("Average Education in Years") +xlab("Marital Status")
+
+# dat5 %>% ggplot(aes(x = married, weight = n)) +
+#   geom_bar()
+```
+
