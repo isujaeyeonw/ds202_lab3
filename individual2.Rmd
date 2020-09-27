@@ -198,6 +198,10 @@ happiness4 = happiness %>%
 
 happiness4
 
+##  Edits by jay.....
+##  I fixed a few labeling issues on this graph. 
+##  it was listing marital status, not income level
+
 # Graphical summary
 happiness$income = factor(happiness$income, levels = c("Lt $1000",
                                                         "$1000 to 2999", 
@@ -221,8 +225,8 @@ happiness %>%
   ggplot(aes(x = income, fill = happiness)) +
   geom_bar(position = 'fill') +
   coord_flip() +
-  ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
-  xlab('Marital Status') +
+  ggtitle('Stacked Barplot of Happiness for Each Income Level') +
+  xlab('Income Level') +
   ylab('Happiness') +
   labs(fill = "Happiness")
 ```
