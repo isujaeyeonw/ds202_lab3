@@ -19,7 +19,7 @@ library(tidyverse)
 # Reading in the data set
 happiness <- readxl::read_xls('JaeyeonWon_GSS.xls')
 
-# Information
+# Structure
 str(happiness) 
 ```
 
@@ -53,16 +53,15 @@ happiness$party = as.factor(happiness$party)
 levels(happiness$party)
 
 # Numerical summary of average years of education for each political party affiliation
-`%notin%` <- Negate(`%in%`)
+`%notin%` = Negate(`%in%`)
 
 happiness1 = happiness %>% 
   filter(edu %notin% c("No answer", "Don't know")) %>%
   group_by(party) %>%
-  summarise(mean_edu = mean(as.numeric(edu), na.rm = TRUE)) %>%
+  summarise(mean_edu = mean(as.numeric(edu))) %>%
   arrange(desc(mean_edu))
 
-happiness1 %>% 
-  head(10)
+happiness1
 
 # Graphical summary of average years of education for each political party affiliation
 happiness1 %>%
@@ -71,14 +70,16 @@ happiness1 %>%
   coord_flip() +
   ggtitle('Barplot of Average Years of Education for Each Political Party Affiliation') +
   xlab('Party Affiliation') +
-  ylab('Average Years of Education')
+  ylab('Average Years of Education') +
+  labs(fill = "Party Affiliation")
 ```
 
-For this analysis, I excluded the answers "No answer" and "Don't know" in the edu variable. People who did not answer or did not know their party affiliation have the highest average years of education (around 9 years). People in strong Democratic party affiliation had the next highest mean years of education of 8.8 years, followed by Other party, Not strong democrat, Strong republican, Independent, Independent near democrat, Not strong republican, and Independent near republican. The people in Independent near Republican group showed the lowest average years of education of 7.9 years.
+For this analysis, we excluded the answers "No answer" and "Don't know" in the edu variable. People who did not know their party affiliation have the highest average years of education (around 9.1 years). People in strong Democratic party affiliation have the next highest mean years of education of 8.8 years, followed by Other party, No answer, Not strong democrat, Strong republican, Independent, Independent near democrat, Not strong republican, and Independent near republican. The people in Independent near Republican group showed the lowest average years of education of 7.9 years.
 
 
 **2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.**
 ```{r}
+# Creating a data frame
 happiness2 = happiness %>% 
   filter(edu %notin% c("No answer", "Don't know")) %>%
   group_by(party) %>%
@@ -86,12 +87,14 @@ happiness2 = happiness %>%
   filter(as.numeric(edu) > median_edu) %>%
   ungroup()
 
+# Structure of data frame
 str(happiness2)
 ```
 
+In this data frame, we have 28143 observations and 10 variables. Compared to the original data set that contains 64814 observations and 9 variables, we lost 36671 observations and added 1 new variable called "median_edu".
+
 
 **For each of the investigation below, create at least one numerical summary and one appropriate visualization. Write a paragraph to describe your findings and the variables you used.**
-
 **3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.**
 ```{r}
 str(happiness)
@@ -104,28 +107,32 @@ levels(happiness$married)
 happiness$happiness = as.factor(happiness$happiness)
 levels(happiness$happiness)
 levels(happiness$happiness) = c("Don't know", "No answer", "Not applicable", "Not too happy", "Happy", "Happy")
+levels(happiness$happiness)
 
-# Numerical summary
+# Numerical summary of the number of people who responded "Happy" in each marital status
 happiness %>%
   filter(happiness == "Happy") %>%
   group_by(married) %>%
   summarise(count = n()) %>%
   arrange(desc(count))
 
-# Graphical summary
+# Graphical summary of the proportion of each responses in each marital status
 happiness %>% 
   ggplot(aes(x = married, fill = happiness)) +
   geom_bar(position = 'fill') +
   coord_flip() +
   ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
   xlab('Marital Status') +
-  ylab('Happiness')
+  ylab('Happiness') +
+  labs(fill = "Happiness")
 ```
+
+For this analysis, we used the variables "happiness" and "married". We are defining that a person is happy if he/she answered either “Very happy” or “Pretty happy”. In the numerical summary, we are only taking into account the number of "Happy" responses (not considering how many people are in each marital status group). Based on the numerical summary, we can see that the group Married" has the highest number of happy people of 29342, which is followed by Never married, Divorced, Widowed, Separated, and No answer. The proportional aspects can be found in the graphical summary. The "Married" people show the highest proportion of the response "Happy". Around 75% of the people the "Widowed", "Divorced", and "Never married" groups also responded that they are happy.  
 
 
 **4. Does party affiliation affect the relationship you found in the last question?**
 ```{r}
-# Numerical summary
+# Numerical summary of the number of people who responded "Happy" in each combination of marital status and party affiliation
 happiness %>%
   filter(happiness == "Happy") %>%
   group_by(married, party) %>%
@@ -139,10 +146,13 @@ happiness %>%
   geom_bar(position = 'fill') +
   facet_wrap(~ party) +
   coord_flip() +
-  ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
+  ggtitle('Stacked Barplot of Happiness for Each Combination of Marital Status and Party Affiliation') +
   xlab('Marital Status') +
-  ylab('Happiness')
+  ylab('Happiness') +
+  labs(fill = "Happiness")
 ```
+
+For this analysis, we used the variables "happiness", "married", and "party".Except for the "Don't know" group, the political party affiliation groups have very similar patterns. Except for the other party groups, the married people have the highest proportion of happy people while the no answer group has the lowest proportion of happy people. In other party group, the no answer group has the highest proportion of happy people. So party affiliation does not have a huge impact on the relationship between happiness and marital status.
 
 
 **5. How is marital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?**
@@ -151,11 +161,10 @@ happiness %>%
 happiness3 = happiness %>% 
   filter(edu %notin% c("No answer", "Don't know")) %>%
   group_by(married) %>%
-  summarise(mean_edu = mean(as.numeric(edu), na.rm = TRUE)) %>%
+  summarise(mean_edu = mean(as.numeric(edu))) %>%
   arrange(desc(mean_edu))
 
-happiness3 %>% 
-  head()
+happiness3
 
 # Graphical summary of average years of education for each marital status
 happiness3 %>%
@@ -164,11 +173,15 @@ happiness3 %>%
   coord_flip() +
   ggtitle('Barplot of Average Years of Education for Each Marital Status') +
   xlab('Marital Status') +
-  ylab('Average Years of Education')
+  ylab('Average Years of Education') +
+  labs(fill = "Happiness")
 ```
+
+Here, we are using the variables "happiness" and married". According to the numerical and graphical summaries, the people in the "Widowed" group has the longest average years of education of 9.6 years. The next group with the next longest mean years of education is "No answer" group. The average years of education decreases in order of "Separated", "Married", "Divorced", and "Never married" groups. The pattern of the "Never married" group ranking the lowest makes sense because the shorter they were educated for, it is more possible that they are younger. And the younger people are more likely to never get married.
 
 
 **6. Explore two more interesting questions, and answer those questions using the GSS data.**
+
 **6.1 How is the happiness of a respondent related to his/her total house income? Define that a person is happy if the response to question is “Very happy” or “Pretty happy” **
 ```{r}
 # income
@@ -183,11 +196,10 @@ happiness4 = happiness %>%
   summarise(count = n()) %>%
   arrange(desc(count))
 
-happiness4 %>%
-  head(12)
+happiness4
 
 # Graphical summary
-happiness$income <- factor(happiness$income, levels = c("Lt $1000",
+happiness$income = factor(happiness$income, levels = c("Lt $1000",
                                                         "$1000 to 2999", 
                                                         "$3000 to 3999",
                                                         "$4000 to 4999",  
@@ -211,23 +223,41 @@ happiness %>%
   coord_flip() +
   ggtitle('Stacked Barplot of Happiness for Each Marital Status') +
   xlab('Marital Status') +
-  ylab('Happiness')
+  ylab('Happiness') +
+  labs(fill = "Happiness")
 ```
 
+To answer this question, we used the variables "happiness" and "income". From the numerical summary, we can see that there are relatively more happy people in higher income range groups, such as "$25000 or more", "$10000 - 14999", "$20000 - 24999", and "$15000 - 19999" groups. In opposite, only 510 people in the "less than $1000" group responded that they are happy. These patterns can also be determined in the graphical summary. People with higher income are more likely to say they are happy while the people with relatively less income are more likely to say they are happy. Specifically, around 40% of the people with income of less than $1000 did not answer that they are happy.
 
-**6.2 ~~**
+
+**6.2 How is the happiness of a respondent related to gender? Define that a person is happy if the response to question is “Very happy” or “Pretty happy” **
 ```{r}
+# gender
+happiness$gender = as.factor(happiness$gender)
+levels(happiness$gender)
 
+# Numerical summary
+happiness5 = happiness %>% 
+  filter(happiness == "Happy") %>%
+  group_by(gender) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+happiness5
+
+# Graphical summary
+happiness %>% 
+  ggplot(aes(x = gender, fill = happiness)) +
+  geom_bar(position = 'fill') +
+  coord_flip() +
+  ggtitle('Stacked Barplot of Happiness by Gender') +
+  xlab('Gender') +
+  ylab('Happiness') +
+  labs(fill = "Happiness")
 ```
 
+For this question, we used the variables "happiness" and "gender". Both from the numerical and graphical summaries, we can clearly see that the gender is not a leading factor of the happiness status. Especially from the bar plot, male and female groups show almost identical patterns. In both groups, around 80% answered they are happy, around 10% answered they are not too happy, around 7% answered it is not applicable, and around 2% responded to "No answer".
 
 
-
-
-
-
-
-
-
-
-
+## Conclusion
+To conclude, even though it is hard to say that certain variables lead to more happiness or less happiness, people's happiness status differ based on different variables. From the marital status analysis, we found that the Married group has the highest proportion of happy people while the Separated group has the lowest proportion of happy people (except for the No answer group). From the income analysis, we found that the higher the total family income is, the more likely they are to feel happy. Different from these variables, it was distinct that respondents' gender does not affect their happiness.
