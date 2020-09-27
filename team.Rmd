@@ -151,8 +151,7 @@ happiness %>%
   labs(fill = "Happiness")
 ```
 
-## Need to be answered here (#4)
-For this analysis, we used the variables "happiness", "married", and "party".
+For this analysis, we used the variables "happiness", "married", and "party".Except for the "Don't know" group, the political party affiliation groups have very similar patterns. Except for the other party groups, the married people have the highest proportion of happy people while the no answer group has the lowest proportion of happy people. In other party group, the no answer group has the highest proportion of happy people. So party affiliation does not have a huge impact on the relationship between happiness and marital status.
 
 
 **5. How is marital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?**
@@ -181,6 +180,7 @@ Here, we are using the variables "happiness" and married". According to the nume
 
 
 **6. Explore two more interesting questions, and answer those questions using the GSS data.**
+
 **6.1 How is the happiness of a respondent related to his/her total house income? Define that a person is happy if the response to question is “Very happy” or “Pretty happy” **
 ```{r}
 # income
@@ -229,8 +229,36 @@ happiness %>%
 To answer this question, we used the variables "happiness" and "income". From the numerical summary, we can see that there are relatively more happy people in higher income range groups, such as "$25000 or more", "$10000 - 14999", "$20000 - 24999", and "$15000 - 19999" groups. In opposite, only 510 people in the "less than $1000" group responded that they are happy. These patterns can also be determined in the graphical summary. People with higher income are more likely to say they are happy while the people with relatively less income are more likely to say they are happy. Specifically, around 40% of the people with income of less than $1000 did not answer that they are happy.
 
 
-**6.2 How is the happiness of a respondent related to his/her total house income? Define that a person is happy if the response to question is “Very happy” or “Pretty happy” **
+**6.2 How is the happiness of a respondent related to gender? Define that a person is happy if the response to question is “Very happy” or “Pretty happy” **
 ```{r}
+# gender
+happiness$gender = as.factor(happiness$gender)
+levels(happiness$gender)
 
+# Numerical summary
+happiness5 = happiness %>% 
+  filter(happiness == "Happy") %>%
+  group_by(gender) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+happiness5
+
+# Graphical summary
+happiness %>% 
+  ggplot(aes(x = gender, fill = happiness)) +
+  geom_bar(position = 'fill') +
+  coord_flip() +
+  ggtitle('Stacked Barplot of Happiness by Gender') +
+  xlab('Gender') +
+  ylab('Happiness') +
+  labs(fill = "Happiness")
 ```
+
+For this question, we used the variables "happiness" and "gender". Both from the numerical and graphical summaries, we can clearly see that the gender is not a leading factor of the happiness status. Especially from the bar plot, male and female groups show almost identical patterns. In both groups, around 80% answered they are happy, around 10% answered they are not too happy, around 7% answered it is not applicable, and around 2% responded to "No answer".
+
+
+## Conclusion
+To conclude, even though it is hard to say that certain variables lead to more happiness or less happiness, people's happiness status differ based on different variables. From the marital status analysis, we found that the Married group has the highest proportion of happy people while the Separated group has the lowest proportion of happy people (except for the No answer group). From the income analysis, we found that the higher the total family income is, the more likely they are to feel happy. Different from these variables, it was distinct that respondents' gender does not affect their happiness.
+
 
