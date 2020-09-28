@@ -72,6 +72,9 @@ dat1
 #############################################################
 ```
 
+The folks who don't know what party they belong to have the highest mean years of education. 
+
+<hr>
 
 2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame.
 
@@ -86,6 +89,11 @@ str(dat2)
 
 ```
 
+
+
+
+
+<hr>
 3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.
 
 
@@ -108,8 +116,10 @@ q3plot + coord_flip()
 
 ```
 
+Married people had the largest number of happy responses. The largest number of not too happy responses was also in the married category. But so many people are in the married category, it might not be surprising that the number is high too. 
 
 
+<hr>
 
 4. Does party affiliation affect the relationship you found in the last question?
 
@@ -142,8 +152,9 @@ ggplot(dat, aes(x = party, y=married, fill=happy)) +   geom_tile() +
 
 ```
 
-I want to do a facet wrap with this, but I get an error. For some reason the "party" data is not available for plotting purposes?
+A tile plot clearly shows the relations between marital status and political party affiliation. 
 
+<hr>
 
 5. How is marrital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?
 
@@ -163,6 +174,10 @@ dat5 %>% ggplot(aes(x =married, weight = avg_edu)) + geom_bar() + ylab("Average 
 
 ```
 
+
+<hr>
+
+6.2
 
 ```{r}
 dat$income = factor(dat$income, levels = c("Lt $1000",
@@ -191,3 +206,5 @@ filter(income %notin% c("Don't know", "No answer", "Not applicable", "Refused"))
 dat6
 
 ```
+
+By making a tile plot of our two categorical variables, marital status and income level, we are easiy able to ascertain which category combinations corespond to certain levels of happiness. At glance you can tell which income levels are happy or not happy and which which marital groups are happy and not happy. This is a very useful graphi representation of a contingency table. For instance, across all marriage categories, respondants in the 6000$ to $6999 range are all relatively happy. But the bin below ($5000 - $5999) all report "not too happy". We suspect that there are more lurking variables which could have a decided impact on perceived happiness. 
