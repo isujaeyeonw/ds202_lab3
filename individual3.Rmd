@@ -1,0 +1,88 @@
+---
+title: "individual3"
+author: "Alec Meyer"
+date: "9/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(ggplot2)
+library(tidyverse)
+
+data <- readxl::read_xls('Alecm_GSS.xls')
+```
+
+Question 1<br />
+```{r}
+data = data %>% 
+  rename(edu = 'Highest year of school completed',
+         party = 'Political party affiliation',
+         happy = 'General happiness', 
+         married = 'Marital status')
+
+
+data$edu = as.factor(data$edu)
+data$edu = as.numeric(data$edu)
+levels(data$edu)
+data$party = as.factor(data$party)
+levels(data$party)
+
+`%notin%` = Negate(`%in%`)
+data1 = data %>% 
+  filter(edu %notin% c("No answer", "Don't know")) %>%
+  group_by(party) %>%
+  summarise(mean_edu = mean(as.numeric(edu))) %>%
+  arrange(desc(mean_edu))
+data1
+```
+
+Question 2<br />
+```{r}
+data2 <- data %>%
+  group_by(party) %>%
+  mutate(edu_med = median(as.numeric(edu))) %>%
+  ungroup() %>%
+  filter(as.numeric(edu) > edu_med)
+
+data2
+```
+
+Question 3<br />
+```{r}
+data3 <- data %>% select(happy, married, party)
+data3 <- data3 %>% group_by(happy, married)
+
+ggplot(data, aes(x = married)) +
+geom_bar(aes(fill = happy)) +
+ggtitle('Relation of Happiness and Merital Status') +
+xlab('Marital Status') +
+ylab('Happiness') +
+labs(fill = "Happiness")
+```
+
+Question 4<br />
+```{r}
+
+ggplot(data, aes(x = married)) +
+  geom_bar(aes(fill = happy)) +
+  facet_wrap(~ party) + #Thank you Jaeyeon
+  ggtitle('Relation of Happiness and Merital Status By Political   Affiliation') +
+  xlab('Marital Status') +
+  ylab('Happiness') +
+  labs(fill = "Happiness") + 
+  coord_flip()
+ 
+```
+
+Question 5<br />
+```{r}
+data4 <- data %>% select(married, edu)
+
+ggplot(data4, aes(x = edu)) + 
+  geom_bar(aes(fill = married)) + 
+  ylab("Average years of Education") +
+  xlab("Marital Status")
+```
+
