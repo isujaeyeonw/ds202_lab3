@@ -46,14 +46,14 @@ dat <- dat %>%
 ```{r}
 dat1 <- dat %>% 
   group_by(party) %>%
-  mutate(edu_avg = mean(as.numeric(edu))) %>% 
+  #mutate(edu_avg = mean(as.numeric(edu))) %>% 
+  summarize(edu_avg=mean(as.numeric(edu))) %>%
   select(party,edu_avg) %>% 
-  distinct(party, .keep_all = TRUE ) %>% 
+  #distinct(party, .keep_all = TRUE ) %>% 
   arrange(desc(edu_avg))
 
 dat1
 
-#dat1
 ########################################################
 # Jaeyeon's Review and Revision
 # You can also try this Jay!
@@ -114,21 +114,32 @@ q3plot + coord_flip()
 4. Does party affiliation affect the relationship you found in the last question?
 
 ```{r}
-dat3 <- dat %>% 
-  select(happy,married,party) %>% 
-  group_by(happy,married) %>%
-  summarize(n=n()) %>% 
-  ungroup()
+# dat3 <- dat %>% 
+#   select(happy,married,party) %>% 
+#   group_by(happy,married) %>%
+#   summarize(n=n()) %>% 
+#   ungroup()
+# 
+# q3plot <- ggplot(dat3, aes(x=married, y=n)) + 
+#   geom_bar(aes(fill=happy),
+#            stat="identity",
+#            color="white",
+#            position = position_dodge(.9)) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+#   xlab("Marital status") + ylab('Frequency') 
 
-q3plot <- ggplot(dat3, aes(x=married, y=n)) + 
-  geom_bar(aes(fill=happy),
-           stat="identity",
-           color="white",
-           position = position_dodge(.9)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
-  xlab("Marital status") + ylab('Frequency') 
+#q3plot   + facet_grid(~party)
 
-q3plot #  + facet_grid(~party)
+
+#ggplot(dat3, aes(x = happy, y=married, fill=party)) +   geom_tile()
+
+ggplot(dat, aes(x = party, y=married, fill=happy)) +   geom_tile() +
+  ggtitle("Tile plot of Marital Status by party, with happiness fill") +
+  xlab("Political Party") + ylab("Marital status") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+
+
 ```
 
 I want to do a facet wrap with this, but I get an error. For some reason the "party" data is not available for plotting purposes?
@@ -148,7 +159,35 @@ dat5 <- dat %>%
 
 dat5 %>% ggplot(aes(x =married, weight = avg_edu)) + geom_bar() + ylab("Average Education in Years") +xlab("Marital Status")
 
-# dat5 %>% ggplot(aes(x = married, weight = n)) +
-#   geom_bar()
+
+
 ```
 
+
+```{r}
+dat$income = factor(dat$income, levels = c("Lt $1000",
+                                                        "$1000 to 2999", 
+                                                        "$3000 to 3999",
+                                                        "$4000 to 4999",  
+                                                        "$5000 to 5999",  
+                                                        "$6000 to 6999",
+                                                        "$7000 to 7999",
+                                                        "$8000 to 9999",
+                                                        "$10000 - 14999", 
+                                                        "$15000 - 19999", 
+                                                        "$20000 - 24999", 
+                                                        "$25000 or more",
+                                                        "Don't know", 
+                                                        "No answer", 
+                                                        "Not applicable", 
+                                                        "Refused"))
+dat6 <- dat %>%
+filter(income %notin% c("Don't know", "No answer", "Not applicable", "Refused")) %>%
+  ggplot(aes(x = income, y=married, fill=happy)) +   geom_tile() +
+  ggtitle("Tile plot of Income by marital status, with happiness fill") +
+  xlab("Income") + ylab("Marital status") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+dat6
+
+```
